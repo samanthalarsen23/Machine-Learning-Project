@@ -151,30 +151,24 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <body><main><section class="md"><div style="background:#f79be3;color:#f0efec;padding:30px 34px 26px;border-radius:14px;border-bottom:6px solid #2a78d6;font-family:system-ui,-apple-system,'Segoe UI',sans-serif">
 <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#0362d7;margin-bottom:8px">Machine learning project · classification</div>
 <div style="font-size:32px;line-height:1.18;font-weight:700;color:#ffffff;margin-bottom:10px">Can demographics and personality traits predict cannabis use?</div>
-<div style="font-size:15px;line-height:1.55;color:#0362d7;max-width:760px">An end-to-end walk through a real dataset: cleaning, feature engineering, clustering without labels, a train/test split, a classifier, and an honest look at how well it works.</div>
+<div style="font-size:15px;line-height:1.55;color:#0362d7;max-width:760px">Feature engineering, clustering without labels, a train/test split, a classifier, and a look at how well the model works.</div>
 </div>
 
 <h2>1 · The dataset, and why I chose it</h2>
 <p>I used the <strong>Drug Consumption (Quantified)</strong> dataset (from UCI Machine Learning Repository).
 <p>This dataset compares self-reported drug use with demographics and certain personality traits. The demographics chosen are age, gender, education, country, and ethnicity. The personality measurements include neuroticism, extraversion, openness to experience, agreeableness, conscientiousness, impulsivity, and sensation seeking. One important thing to note is that this data was taken before cannabis was made legal in parts of the United States.</p>
-<p>Cannabis use is classified into seven different levels: </p>
-<p>CL0: Never Used</p>
-<p>CL1: Used over a Decade Ago</p>
-<p>CL2: Used in Last Decade</p>
-<p>CL3: Used in Last Year</p>
-<p>CL4: Used in Last Month</p>
-<p>CL5: Used in Last Weel</p>
-<p>CL6: Used in Last Day</p>
-<p><strong> Why it interests me: </strong>This dataset interests me becuase of the unique data points. </p></section>
+<p>Cannabis use is classified into seven different levels, from CL0 (Never Used) to CL6 (Used in Last Day).</p>
+
+<p><strong> Why it interests me: </strong>This dataset interests me becuase of the implications of the results. If drug use could be bettert predicted and understood, there could be better systems in place to help people struggling with addiction. </p></section>
 
 <section class="md"><h2>2 · Feature engineering</h2>
 <h3>2.1 Class (im)balance</h3></section>
-<img src="images\class_imbalance.png" style = "border: 4px solid rgb(62, 120, 156)">
+<img src="images\class_imbalance.png" style = "width: 50%; height: auto; border: 4px solid rgb(62, 120, 156)">
 <section class="md"><p> The class imbalance is mostly evenly distributed, with the exceptions of CL0 and CL6 being higher than the others. I will keep my train/test splits stratified so they will have equal distributions of cannabis use.</p>
   <h3>2.2 Feature histograms and outliers</h3></section>
 <img src="images\feature_histograms.png"  style="width: 85%; height: auto; border: 4px solid rgb(62, 120, 156);">
 
-<p class = "center-text">The data for the personality traits appears to be normally distributed. Age is right skewed, but there are no outliers that need to be removed.</p>
+<p class = "center-text">All the data for the personality traits appears to be generally normally distributed. Age is right skewed, but there are no outliers that need to be removed.</p>
 
 <section class="md"><h3>2.3 Missing values</h3></section>
 
@@ -185,7 +179,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p> Most of the numeric data has already been normalized to work in a machine learning environment. However, I chose to one-hot encode the Gender column, and turn it into two columns (Male and Female).</p>
 
 <h3>2.5 Correlated columns</h3></section>
-<img src="images\correlation.png" style = "border: 4px solid rgb(62, 120, 156)">
+<img src="images\correlation.png" style = "width: 60%; height: auto;border: 4px solid rgb(62, 120, 156)">
 <p>The personality measures are most likely to be correlated because of their common normal distribution. The highest correlation is between SS and Impulsiveness, but at a 0.62 value, it is not high enough to remove.</p>
 
 <h2>3 · Looking for clusters</h2></section>
@@ -196,48 +190,40 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 
 
-<p>There is no clear angle in the elbow graph, so I found the silhouete scores for X as well. The silhouette chart shows that the optimal number of clusters is 4.</p>
+<p>There is no clear angle in the elbow graph, so I found the silhouete scores for X as well. The silhouette graph shows that the optimal number of clusters is 4.</p>
 
-<img src="images\clusters.png" style="border: 4px solid rgb(62, 120, 156);">
+<img src="images\clusters.png" style="width: 60%; height: auto;border: 4px solid rgb(62, 120, 156);">
 
 
-<p>This scatterplot is a result of running the K-Means Clustering algorithm on the X dataset. There are two obvious clusters (red and blue), but the purple and teal points are just overlapping each other.</p>
+<p>This scatterplot is a result of running the K-Means Clustering algorithm on the X dataset. There are two obvious clusters (red and blue), but the purple and teal points are overlapping with each other.</p>
   
  
 
 <h2>4 · Train / test split</h2></section>
 
 </pre></div></details><pre class="out-text">train: 1507 respondents    |   test: 377 respondents</pre></section>
-<section class="md"><p>Everything that <em>learns from data</em> (the scaler, the imputer, the model, and the choice of its settings) is fitted on the <strong>training set only</strong>. The test set is touched once, at the very end, so the final score is an honest estimate of performance on new patients. A step like the correlation pruning above used only the feature columns, never the diagnosis, so it did not leak the answer.</p>
+<section class="md"><p>Everything that learns from data (the scaler, imputer, model, and the choice of its settings) is fitted on the training set only. The test set is touched once, at the very end, so the final score is an honest estimate of performance on new patients.</p>
 
   <h2>5 · Choosing an algorithm</h2>
 <p>In order to predict the discrete levels of cannabis use, I needed a classification algorithm. I chose the <b>Random Forest</b> algorithm. This algorithm creates multiple decision trees using different samples and features, then combines their predictions. </p>
   <h2>6 · Training the model</h2>
 
+<p>I trained a Random Forest classifier on the training set, which included 80% of the respondents. The inputs were the demographics and personality of each respondent, and the target value was the cannabis use level. </p>
+
 <h2>7 · Testing the model</h2></section>
+<p>I used the trained model to predict the use level for the remaining respondents. Because the final answers are discrete, the data can only be exactly right or wrong, but some inaccuracies are much more extreme than others.</p>
+<section class="md"><h2>8 · Confusion matrix</h2></section>
 
-<section class="md"><h2>8 · How good is it?</h2></section>
 
-
-<img src = "images\confusion.png">
-
+<img src = "images\confusion.png" style="width: 50%; height: auto; border: 4px solid rgb(62, 120, 156);">
+<p>The above confusion matrix shows the correct predictions across the diagonal. On the 377 test respondents, the model had an accuracy of 41%.</p>
 
 <section class="md"><h2>9 · What I learned</h2>
-<div style="display:flex;gap:12px;flex-wrap:wrap;margin:6px 0 18px;font-family:system-ui,-apple-system,'Segoe UI',sans-serif">
-<div style="flex:1;min-width:150px;background:#f4f3ef;border:1px solid #e1e0d9;border-radius:12px;padding:14px 16px"><div style="font-size:30px;font-weight:700;color:#0b0b0b;line-height:1.1">97.4%</div><div style="font-size:12px;color:#52514e;margin-top:4px">test accuracy<br>(baseline 62.7%)</div></div>
-<div style="flex:1;min-width:150px;background:#f4f3ef;border:1px solid #e1e0d9;border-radius:12px;padding:14px 16px"><div style="font-size:30px;font-weight:700;color:#eb6834;line-height:1.1">40/43</div><div style="font-size:12px;color:#52514e;margin-top:4px">cancers caught<br>(recall 93.0%)</div></div>
-<div style="flex:1;min-width:150px;background:#f4f3ef;border:1px solid #e1e0d9;border-radius:12px;padding:14px 16px"><div style="font-size:30px;font-weight:700;color:#0b0b0b;line-height:1.1">0</div><div style="font-size:12px;color:#52514e;margin-top:4px">false alarms<br>(precision 100.0%)</div></div>
-<div style="flex:1;min-width:150px;background:#f4f3ef;border:1px solid #e1e0d9;border-radius:12px;padding:14px 16px"><div style="font-size:30px;font-weight:700;color:#0b0b0b;line-height:1.1">0.996</div><div style="font-size:12px;color:#52514e;margin-top:4px">ROC AUC<br>(1.0 = perfect)</div></div>
-</div>
 
-<p><strong>About the data.</strong> Size and shape measurements of cell nuclei separate the two diagnoses well. This showed up in three places: the histograms, the clustering (which found a diagnosis-like split without ever seeing the labels, though only with purity 82%), and the classifier. Outliers were not noise here. The most extreme tumours were overwhelmingly malignant, so deleting them would have thrown away signal and I removed only 2 isolated spikes. The size columns are near-duplicates of each other, so I could drop 10 of the 30 columns with no meaningful loss (cross-validated F1 0.964 against 0.967 with all 30).</p>
-<p><strong>About the model.</strong> On tumours it had never seen, the tuned logistic regression was right <strong>97.4%</strong> of the time (95% bootstrap range 94%–100%), well above the 63% an "always benign" rule would score. It caught <strong>40 of 43 cancers</strong> and raised <strong>0</strong> false alarms. The test set is small (only 114 tumours), so one extra mistake moves accuracy by about 0.9 points and recall by about 2.3, and the ranges above are the honest way to read the headline numbers. It also scored slightly higher than the random forest in cross-validation (F1 0.964 against 0.942), so the simpler, more interpretable model was a sensible choice here.</p>
-<p><strong>Limits, and what I would do next.</strong></p>
-<ul>
-<li>This is <strong>one dataset of 569 patients from a single source</strong>, with features already extracted from images by software. It says nothing about how the model would behave on a different scanner, lab or population, and it is a learning exercise, <strong>not a diagnostic tool</strong>.</li>
-<li>A missed cancer costs far more than a false alarm, so a real system would <strong>lower the decision threshold</strong> (chosen on validation data, not the test set) to push recall higher, accepting more false alarms.</li>
-<li>With more time I would repeat the whole evaluation with several different random splits, try gradient boosting, and check calibration, i.e. whether "90% sure" really means right nine times out of ten.</li>
-</ul></section></main>
+
+<p><strong>About the data:</strong> Personality and demographics do hold some weight in predicting cannabis use. Age was the clearest demographic pattern, and impulsiveness/conscientiousness are the strongest personality predictors.</p>
+<p><strong>About the model:</strong> The random forest was exactly right for 41% of test respondents, and within one level above/below for 64%. It works best for predicting high and low use, but not so much as a precise predictor.</p>
+
 <script>/* open every code block when printing or saving as PDF */
 window.addEventListener("beforeprint",()=>document.querySelectorAll("details.codewrap").forEach(d=>d.open=true));</script>
 </body></html>
