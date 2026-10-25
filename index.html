@@ -166,7 +166,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <img src="images\class_imbalance.png" style = "width: 50%; height: auto; border: 4px solid rgb(62, 120, 156)">
 <section class="md"><p> The class imbalance is mostly evenly distributed, with the exceptions of CL0 and CL6 being higher than the others. I will keep my train/test splits stratified so they will have equal distributions of cannabis use.</p>
   <h3>2.2 Feature histograms and outliers</h3></section>
-<img src="images\feature_histograms.png"  style="width: 85%; height: auto; border: 4px solid rgb(62, 120, 156);">
+<img src="images\hist.png"  style="width: 85%; height: auto; border: 4px solid rgb(62, 120, 156);">
 
 <p class = "center-text">All the data for the personality traits appears to be generally normally distributed. Age is right skewed, but there are no outliers that need to be removed.</p>
 
@@ -176,7 +176,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <h3>2.4 Encoding text fields</h3></section>
 
-<p> Most of the numeric data has already been normalized to work in a machine learning environment. However, I chose to one-hot encode the Gender column, and turn it into two columns (Male and Female).</p>
+<p> Most of the numeric data has already been normalized to work in a machine learning environment. However, I chose to one-hot encode the categorical columns: Age, Gender, Country, Education, and Ethnicity. This way, higher/lower numerical values that represent different categories will not affect the data. The reason why I chose not to use ordinal encoding with the Education column is because there are too many distinct categories, and ranking them would not be accurate.</p>
 
 <h3>2.5 Correlated columns</h3></section>
 <img src="images\correlation.png" style = "width: 60%; height: auto;border: 4px solid rgb(62, 120, 156)">
@@ -185,45 +185,60 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <h2>3 · Looking for clusters</h2></section>
 
 <div style="display: flex; gap: 10px;">
-  <img src="images\elbow.png" alt="Image 1" style="width: 50%; height: auto; border: 4px solid rgb(62, 120, 156);">
-  <img src="images\silhouette.png" alt="Image 2" style="width: 50%; height: auto; border: 4px solid rgb(62, 120, 156);">
+  <img src="images\elbow.png" alt="Image 1" style="width: 45%; height: auto; border: 4px solid rgb(62, 120, 156);">
+  <img src="images\silhouette.png" alt="Image 2" style="width: 45%; height: auto; border: 4px solid rgb(62, 120, 156);">
 </div>
 
 
-<p>There is no clear angle in the elbow graph, so I found the silhouete scores for X as well. The silhouette graph shows that the optimal number of clusters is 4.</p>
+<p>There is no clear angle in the elbow graph, so I found the silhouette scores for X as well. The silhouette graph shows that the optimal number of clusters is 2.</p>
 
 <img src="images\clusters.png" style="width: 60%; height: auto;border: 4px solid rgb(62, 120, 156);">
 
 
-<p>This scatterplot is a result of running the K-Means Clustering algorithm on the X dataset. There are two obvious clusters (red and blue), but the purple and teal points are overlapping with each other.</p>
+<p>This scatterplot is a result of running the K-Means Clustering algorithm on the X dataset. Before that, I applied Principal Component Analysis. PCA reduces the features to two dimensions so the clusters can be seen.</p>
   
- 
+ <img src="images\clustermeans.png" style="width: 45%; height: auto;border: 4px solid rgb(62, 120, 156);">
+
+<p>In order to interpret which features define the two clusters, we can look at the standardized feature means. Cluster 0 averages higher impulsivity and sensation seeking, with the opposite being true for cluster 1. The clusters are also separated largely by age and country. When the cannabis use feature is added back, these clusters represent respondents who answered <strong>C0</strong> and <strong>C6</strong>.</p>
 
 <h2>4 · Train / test split</h2></section>
 
 </pre></div></details><pre class="out-text">train: 1507 respondents    |   test: 377 respondents</pre></section>
-<section class="md"><p>Everything that learns from data (the scaler, imputer, model, and the choice of its settings) is fitted on the training set only. The test set is touched once, at the very end, so the final score is an honest estimate of performance on new patients.</p>
+<section class="md"><p>The model is fitted on 80% of the data, and tested on 20%.</p>
 
   <h2>5 · Choosing an algorithm</h2>
-<p>In order to predict the discrete levels of cannabis use, I needed a classification algorithm. I chose the <b>Random Forest</b> algorithm. This algorithm creates multiple decision trees using different samples and features, then combines their predictions. </p>
-  <h2>6 · Training the model</h2>
+<p>In order to predict the discrete levels of cannabis use, I needed a classification algorithm. I chose the <b>Random Forest</b> algorithm. This algorithm creates multiple decision trees using different samples and features, then combines their predictions for a final answer. </p>
+  <h2>6 · Training & testing the model</h2>
 
-<p>I trained a Random Forest classifier on the training set, which included 80% of the respondents. The inputs were the demographics and personality of each respondent, and the target value was the cannabis use level. </p>
-
-<h2>7 · Testing the model</h2></section>
+<p>I trained a Random Forest classifier with 200 decision trees on the training set. The inputs were the demographics and personality of each respondent, and the target value was the cannabis use level. </p>
 <p>I used the trained model to predict the use level for the remaining respondents. Because the final answers are discrete, the data can only be exactly right or wrong, but some inaccuracies are much more extreme than others.</p>
-<section class="md"><h2>8 · Confusion matrix</h2></section>
+
+
+<section class="md"><h2>7 · Confusion matrix / accuracy</h2></section>
 
 
 <img src = "images\confusion.png" style="width: 50%; height: auto; border: 4px solid rgb(62, 120, 156);">
-<p>The above confusion matrix shows the correct predictions across the diagonal. On the 377 test respondents, the model had an accuracy of 41%.</p>
+<p>The confusion matrix shows the correct predictions across the diagonal. On the 377 test respondents, the model had an overall accuracy of <strong> 41.9%. </strong> However, the accuracy was almost entirely from predicting the extreme values, C0 and C6. </p>
+ <p> When predicting C0 and C6, the model's accuracy is <strong>75.7%. </strong> But when they are removed, the accuracy drops to only <strong>10.7%.</strong> </p>
 
-<section class="md"><h2>9 · What I learned</h2>
+<section class="md"><h2>8 · Findings about the data</h2>
 
+<img src = "images\important.png" style="width: 40%; height: auto; border: 4px solid rgb(62, 120, 156);">
+<p><strong>Personality:</strong> 
+  Openness to experience was the most important decision factor, with the second and third being neuroticism and conscientiousness. All 7 traits are approximately within the same 8-12% range.</p>
+<p><strong>Demographics: </strong>Education, country, and age have nearly the same weight. However, the demographic features contributed less than half as much to the predictions as the personality features. Ethnicity and gender were both under 3% importance.</p>
+<p>Between personality traits and demographics, the former is a much stronger feature in predicting cannabis use, at <strong>74.2%</strong> vs <strong>25.8%</strong>. However, none of the individual features have an importance of more than 12%. There is no one clear feature that leads to the prediction.</p>
 
-<p><strong>About the data:</strong> Personality and demographics do hold some weight in predicting cannabis use. Age was the clearest demographic pattern, and impulsiveness/conscientiousness are the strongest personality predictors.</p>
-<p><strong>About the model:</strong> The random forest was exactly right for 41% of test respondents, and within one level above/below for 64%. It works best for predicting high and low use, but not so much as a precise predictor.</p>
+<section class="md"><h2>9 · About the model</h2>
 
-<script>/* open every code block when printing or saving as PDF */
-window.addEventListener("beforeprint",()=>document.querySelectorAll("details.codewrap").forEach(d=>d.open=true));</script>
-</body></html>
+  <p>Now we can look back at the two distinct clusters. The clusters represent <strong>C0 </strong>and <strong>C6</strong> respectively. The model is at its best when predicting the extremes, and these clusters are grouped around them.</p>
+<p><strong>Prediction accuracy:</strong> The random forest was exactly right for <strong>41.9%</strong> of its predictions, but the accuracy drops to just <strong>10.9%</strong> when C0 and C6 are removed. </p>
+
+<p>With an accuracy of <strong>75.7%</strong> for C0 and C6, this model could be considered an accurate predictor for highs and lows. It works best predicting only the extreme values. It falls short predicting everything in-between. </p>
+<p></p>
+<p></p>
+<p></p>
+<p style = "font-size: small;">Data: </p> <a style = "font-size: small;" href = "https://archive.ics.uci.edu/dataset/373/drug+consumption+quantified">https://archive.ics.uci.edu/dataset/373/drug+consumption+quantified</a>
+<p></p>
+<p></p>
+<p style = "font-size: small;">Code: </p>
