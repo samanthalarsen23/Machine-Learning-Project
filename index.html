@@ -155,11 +155,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 </div>
 
 <h2>1 · The dataset, and why I chose it</h2>
-<p>I used the <strong>Drug Consumption (Quantified)</strong> dataset (from UCI Machine Learning Repository).
+<p>I used the <strong>Drug Consumption (Quantified)</strong> dataset (from <a href = "https://archive.ics.uci.edu/dataset/373/drug+consumption+quantified">UCI Machine Learning Repository</a>) </p>
 <p>This dataset compares self-reported drug use with demographics and certain personality traits. The demographics chosen are age, gender, education, country, and ethnicity. The personality measurements include neuroticism, extraversion, openness to experience, agreeableness, conscientiousness, impulsivity, and sensation seeking. One important thing to note is that this data was taken before cannabis was made legal in parts of the United States.</p>
 <p>Cannabis use is classified into seven different levels, from CL0 (Never Used) to CL6 (Used in Last Day).</p>
 
-<p><strong> Why it interests me: </strong>This dataset interests me becuase of the implications of the results. If drug use could be bettert predicted and understood, there could be better systems in place to help people struggling with addiction. </p></section>
+<p><strong> Why it interests me: </strong>This dataset interests me becuase of the implications of the results. If drug use could be better predicted and understood, there could be better systems in place to help people struggling with addiction. </p></section>
 
 <section class="md"><h2>2 · Feature engineering</h2>
 <h3>2.1 Class (im)balance</h3></section>
@@ -168,7 +168,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
   <h3>2.2 Feature histograms and outliers</h3></section>
 <img src="images\hist.png"  style="width: 85%; height: auto; border: 4px solid rgb(62, 120, 156);">
 
-<p class = "center-text">All the data for the personality traits appears to be generally normally distributed. Age is right skewed, but there are no outliers that need to be removed.</p>
+<p class = "center-text">All the data for the personality traits appears to be generally normally distributed. There are no outliers that need to be removed.</p>
 
 <section class="md"><h3>2.3 Missing values</h3></section>
 
@@ -176,11 +176,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <h3>2.4 Encoding text fields</h3></section>
 
-<p> Most of the numeric data has already been normalized to work in a machine learning environment. However, I chose to one-hot encode the categorical columns: Age, Gender, Country, Education, and Ethnicity. This way, higher/lower numerical values that represent different categories will not affect the data. The reason why I chose not to use ordinal encoding with the Education column is because there are too many distinct categories, and ranking them would not be accurate.</p>
+<p> Most of the numeric data has already been normalized to work in a machine learning environment. However, I chose to one-hot encode the demographic features: age, gender, country, education, and ethnicity. This way, higher/lower numerical values that represent different categories will not affect the data. The reason why I chose not to ordinal encode Education is because there are too many distinct categories, and ranking them would not be accurate.</p>
 
 <h3>2.5 Correlated columns</h3></section>
 <img src="images\correlation.png" style = "width: 60%; height: auto;border: 4px solid rgb(62, 120, 156)">
-<p>The personality measures are most likely to be correlated because of their common normal distribution. The highest correlation is between SS and Impulsiveness, but at a 0.62 value, it is not high enough to remove.</p>
+<p>The personality measures are most likely to be correlated because of their common normal distribution. The highest correlation is between SS and impulsiveness, but at a 0.62 value, it is not high enough to remove.</p>
 
 <h2>3 · Looking for clusters</h2></section>
 
@@ -238,7 +238,5 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <p></p>
 <p></p>
 <p></p>
-<p style = "font-size: small;">Data: </p> <a style = "font-size: small;" href = "https://archive.ics.uci.edu/dataset/373/drug+consumption+quantified">https://archive.ics.uci.edu/dataset/373/drug+consumption+quantified</a>
-<p></p>
-<p></p>
-<p style = "font-size: small;">Code: </p>
+
+<a href = "https://github.com/samanthalarsen23/Machine-Learning-Project/blob/master/cannabisuseml.py">Code</a>
